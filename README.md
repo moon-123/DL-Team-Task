@@ -5,7 +5,7 @@
 ### 1-1. 데이터 불러오기
 
 > 케글 API를 사용하여 데이터 불러오기
-```
+```python
 import os
 
 os.environ['KAGGLE_USERNAME'] = '본인 케글 이름'
@@ -14,19 +14,19 @@ os.environ['KAGGLE_KEY'] = '본인 케글 키'
 
 kaggle 데이터셋 불러오는 명령어
 
-```
+```python
 !kaggle datasets download -d jehanbhathena/weather-dataset
 ```
 
 불러온 데이터 압출 풀기 
 
-```
+```python
 !unzip -q weather-dataset.zip
 ```
 
 ### 1-2. train, validation 나누기
 
-```
+```python
 import os
 import random
 import shutil
@@ -77,7 +77,7 @@ validation_path = 'validation'
 split_dataset_by_class(dataset_path, train_path, validation_path, validation_ratio=0.2)
 ```
 
-```
+```python
 train_list_dew = os.listdir('train/dew')
 valid_list_dew = os.listdir('validation/dew')
 
@@ -85,7 +85,7 @@ print(len(train_list_dew), len(valid_list_dew))
 ```
 ### 1-3. 모듈 설정, dataset 객체 만들기
 
-```
+```python
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -123,12 +123,12 @@ image_datasets = {
 ```
 
 클래스 개수 확인
-```
+```python
 image_datasets['train'].classes, len(image_datasets['train'].classes) # 11개
 ```
 
 ### 1-4. 데이터 로더
-```
+```python
 dataloaders = {
     'train': DataLoader(
         image_datasets['train'],
@@ -144,7 +144,7 @@ dataloaders = {
 ```
 
 이미지 시각화
-```
+```python
 imgs, labels = next(iter(dataloaders['train']))
 fig, axes = plt.subplots(4, 8, figsize=(20, 10))
 
@@ -160,7 +160,7 @@ for img, label, ax in zip(imgs, labels, axes.flatten()):
 ### 2-1. 전이학습에 사용할 모델 선정
 * 기존에 사용한 efficientnet_b4 보다 적합한 모델을 찾아야함
 * RESNET101을 사용해보겠음
-```
+```python
 from torchvision.models import resnet101, ResNet101_Weights
 from torchvision.models._api import WeightsEnum
 from torch.hub import load_state_dict_from_url
@@ -175,7 +175,7 @@ model = resnet101(weights=ResNet101_Weights.DEFAULT)
 ```
 
 시도한 모델을 포함
-```
+```python
 # FC Layer 수정
 for param in model.parameters():
     param.requires_grad = False # 가져온 파라미터 (W, b)를 업데이트하지 않음
@@ -226,14 +226,14 @@ model = model.to(device)
 ```
 
 전이학습용 모델 fc 확인
-```
+```python
 imgs, label = next(iter(dataloaders['train']))
 # y_pred = model(dataloaders['train'].)
 model.fc
 ```
 
 모델 학습
-```
+```python
 # 학습
 # optimizer: Adam
 # epochs: 10
@@ -284,7 +284,7 @@ for epoch in range(epochs+1):
 ```
 
 가장 성능이 좋게 평가된 모델 저장
-```
+```python
 torch.save(model.state_dict(), 'weather_ResNet101_model.pth')
 ```
 
@@ -298,7 +298,7 @@ torch.save(model.state_dict(), 'weather_ResNet101_model.pth')
 batch size: 32, shuffle: True, lr:0.001
 
 ### Model(FC)
-```
+```python
 Sequential(
   (0): Linear(in_features=2048, out_features=512, bias=True)
   (1): ReLU()
@@ -306,7 +306,7 @@ Sequential(
 )
 ```
 ### Result
-```
+```python
 train     : Epoch   10/10 Loss: 0.131252 Accuracy: 95.56%
 validation: Epoch   10/10 Loss: 0.466486 Accuracy: 88.61%
 ```
@@ -320,7 +320,7 @@ filename: model1.pth
 batch size: 32, shuffle: True, lr:0.001
 
 ### Model(FC)
-```
+```python
 Sequential(
   (0): Linear(in_features=2048, out_features=1024, bias=True)
   (1): ReLU()
@@ -330,7 +330,7 @@ Sequential(
 )
 ```
 ### Result
-```
+```python
 train     : Epoch   10/10 Loss: 0.151008 Accuracy: 94.49%
 validation: Epoch   10/10 Loss: 0.487187 Accuracy: 87.31%
 ```
@@ -343,7 +343,7 @@ filename: x
 batch size: 32, shuffle: True, lr:0.001
 
 ### Model(FC)
-```
+```python
 Sequential(
   (0): Linear(in_features=2048, out_features=1024, bias=True)
   (1): ReLU()
@@ -357,7 +357,7 @@ Sequential(
 )
 ```
 ### Result
-```
+```python
 train     : Epoch   10/10 Loss: 0.183164 Accuracy: 94.09%
 validation: Epoch   10/10 Loss: 0.469859 Accuracy: 87.23%
 
@@ -377,7 +377,7 @@ filename: model3.pth
 batch size: 32, shuffle: True, lr:0.001
 
 ### Model(FC)
-```
+```python
 Sequential(
   (0): Linear(in_features=2048, out_features=1024, bias=True)
   (1): ReLU()
@@ -394,7 +394,7 @@ Sequential(
 )
 ```
 ### Result
-```
+```python
 train     : Epoch   10/10 Loss: 0.321553 Accuracy: 90.27%
 validation: Epoch   10/10 Loss: 0.386997 Accuracy: 89.26%
 ```
@@ -411,7 +411,7 @@ filename: model4.pth
 batch size: 32, shuffle: True, lr:0.002
 
 ### Model(FC)
-```
+```python
 Sequential(
   (0): Linear(in_features=2048, out_features=1024, bias=True)
   (1): ReLU()
@@ -428,7 +428,7 @@ Sequential(
 )
 ```
 ### Result
-```
+```python
 train     : Epoch   10/10 Loss: 0.389684 Accuracy: 88.73%
 validation: Epoch   10/10 Loss: 0.476691 Accuracy: 87.11%
 ```
